@@ -145,6 +145,7 @@ class FirstGame(QMainWindow):
             self.ufo4.hide()
         if self.ufo1.isHidden() and self.ufo2.isHidden() and self.ufo3.isHidden() and self.ufo4.isHidden():
             self.label.show()
+            self.hero.hide()
             self.btn_start.setText('RESTART')
             self.btn_start.setEnabled(True)
             self.btn_start.show()
