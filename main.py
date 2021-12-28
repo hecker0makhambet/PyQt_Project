@@ -6,7 +6,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton
-
+import time
+from random import randrange
+from PyQt5 import QtGui, QtCore
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -159,172 +161,165 @@ class SecondGame(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi('data\\Secondgame.ui', self)
-        import sys
-import time
-from random import randrange
+        
+        
+        class Snake(QMainWindow):
+            def __init__(self):
+                super(Snake, self).__init__()
+                self.initUI()
 
-from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow
+            def initUI(self):
+                self.highscore = 0
+                self.newGame()
+                self.setStyleSheet("QWidget { background: #A9F5D0 }")
+                self.setFixedSize(300, 300)
+                self.setWindowTitle('Snake')
+                self.show()
 
+            def paintEvent(self, event):
+                qp = QtGui.QPainter()
+                qp.begin(self)
+                self.scoreBoard(qp)
+                self.placeFood(qp)
+                self.drawSnake(qp)
+                self.scoreText(event, qp)
+                if self.isOver:
+                    self.gameOver(event, qp)
+                qp.end()
 
-class Snake(QMainWindow):
-    def __init__(self):
-        super(Snake, self).__init__()
-        self.initUI()
+            def keyPressEvent(self, e):
+                if not self.isPaused:
+                    if e.key() == QtCore.Qt.Key_Up and self.lastKeyPress != 'UP' and self.lastKeyPress != 'DOWN':
+                        self.direction("UP")
+                        self.lastKeyPress = 'UP'
+                    elif e.key() == QtCore.Qt.Key_Down and self.lastKeyPress != 'DOWN' and self.lastKeyPress != 'UP':
+                        self.direction("DOWN")
+                        self.lastKeyPress = 'DOWN'
+                    elif e.key() == QtCore.Qt.Key_Left and self.lastKeyPress != 'LEFT' and self.lastKeyPress != 'RIGHT':
+                        self.direction("LEFT")
+                        self.lastKeyPress = 'LEFT'
+                    elif e.key() == QtCore.Qt.Key_Right and self.lastKeyPress != 'RIGHT' and self.lastKeyPress != 'LEFT':
+                        self.direction("RIGHT")
+                        self.lastKeyPress = 'RIGHT'
+                    elif e.key() == QtCore.Qt.Key_P:
+                        self.pause()
+                elif e.key() == QtCore.Qt.Key_P:
+                    self.start()
+                elif e.key() == QtCore.Qt.Key_Space:
+                    self.newGame()
+                elif e.key() == QtCore.Qt.Key_Escape:
+                    self.close()
 
-    def initUI(self):
-        self.highscore = 0
-        self.newGame()
-        self.setStyleSheet("QWidget { background: #A9F5D0 }")
-        self.setFixedSize(300, 300)
-        self.setWindowTitle('Snake')
-        self.show()
-
-    def paintEvent(self, event):
-        qp = QtGui.QPainter()
-        qp.begin(self)
-        self.scoreBoard(qp)
-        self.placeFood(qp)
-        self.drawSnake(qp)
-        self.scoreText(event, qp)
-        if self.isOver:
-            self.gameOver(event, qp)
-        qp.end()
-
-    def keyPressEvent(self, e):
-        if not self.isPaused:
-            if e.key() == QtCore.Qt.Key_Up and self.lastKeyPress != 'UP' and self.lastKeyPress != 'DOWN':
-                self.direction("UP")
-                self.lastKeyPress = 'UP'
-            elif e.key() == QtCore.Qt.Key_Down and self.lastKeyPress != 'DOWN' and self.lastKeyPress != 'UP':
-                self.direction("DOWN")
-                self.lastKeyPress = 'DOWN'
-            elif e.key() == QtCore.Qt.Key_Left and self.lastKeyPress != 'LEFT' and self.lastKeyPress != 'RIGHT':
-                self.direction("LEFT")
-                self.lastKeyPress = 'LEFT'
-            elif e.key() == QtCore.Qt.Key_Right and self.lastKeyPress != 'RIGHT' and self.lastKeyPress != 'LEFT':
-                self.direction("RIGHT")
+            def newGame(self):
+                self.score = 0
+                self.x = 12;
+                self.y = 36;
                 self.lastKeyPress = 'RIGHT'
-            elif e.key() == QtCore.Qt.Key_P:
-                self.pause()
-        elif e.key() == QtCore.Qt.Key_P:
-            self.start()
-        elif e.key() == QtCore.Qt.Key_Space:
-            self.newGame()
-        elif e.key() == QtCore.Qt.Key_Escape:
-            self.close()
+                self.timer = QtCore.QBasicTimer()
+                self.snakeArray = [[self.x, self.y], [self.x-12, self.y], [self.x-24, self.y]]
+                self.foodx = 0
+                self.foody = 0
+                self.isPaused = False
+                self.isOver = False
+                self.FoodPlaced = False
+                self.speed = 100
+                self.start()
 
-    def newGame(self):
-        self.score = 0
-        self.x = 12;
-        self.y = 36;
-        self.lastKeyPress = 'RIGHT'
-        self.timer = QtCore.QBasicTimer()
-        self.snakeArray = [[self.x, self.y], [self.x-12, self.y], [self.x-24, self.y]]
-        self.foodx = 0
-        self.foody = 0
-        self.isPaused = False
-        self.isOver = False
-        self.FoodPlaced = False
-        self.speed = 100
-        self.start()
+            def pause(self):
+                self.isPaused = True
+                self.timer.stop()
+                self.update()
 
-    def pause(self):
-        self.isPaused = True
-        self.timer.stop()
-        self.update()
+            def start(self):
+                self.isPaused = False
+                self.timer.start(self.speed, self)
+                self.update()
 
-    def start(self):
-        self.isPaused = False
-        self.timer.start(self.speed, self)
-        self.update()
+            def direction(self, dir):
+                if (dir == "DOWN" and self.checkStatus(self.x, self.y + 12)):
+                    self.y += 12
+                    self.repaint()
+                    self.snakeArray.insert(0, [self.x, self.y])
+                elif (dir == "UP" and self.checkStatus(self.x, self.y - 12)):
+                    self.y -= 12
+                    self.repaint()
+                    self.snakeArray.insert(0, [self.x, self.y])
+                elif (dir == "RIGHT" and self.checkStatus(self.x + 12, self.y)):
+                    self.x += 12
+                    self.repaint()
+                    self.snakeArray.insert(0, [self.x, self.y])
+                elif (dir == "LEFT" and self.checkStatus(self.x-12, self.y)):
+                    self.x -= 12
+                    self.repaint()
+                    self.snakeArray.insert(0, [self.x, self.y])
 
-    def direction(self, dir):
-        if (dir == "DOWN" and self.checkStatus(self.x, self.y + 12)):
-            self.y += 12
-            self.repaint()
-            self.snakeArray.insert(0, [self.x, self.y])
-        elif (dir == "UP" and self.checkStatus(self.x, self.y - 12)):
-            self.y -= 12
-            self.repaint()
-            self.snakeArray.insert(0, [self.x, self.y])
-        elif (dir == "RIGHT" and self.checkStatus(self.x + 12, self.y)):
-            self.x += 12
-            self.repaint()
-            self.snakeArray.insert(0, [self.x, self.y])
-        elif (dir == "LEFT" and self.checkStatus(self.x-12, self.y)):
-            self.x -= 12
-            self.repaint()
-            self.snakeArray.insert(0, [self.x, self.y])
+            def scoreBoard(self, qp):
+                qp.setPen(QtCore.Qt.NoPen)
+                qp.setBrush(QtGui.QColor(25, 80, 0, 160))
+                qp.drawRect(0, 0, 300, 24)
 
-    def scoreBoard(self, qp):
-        qp.setPen(QtCore.Qt.NoPen)
-        qp.setBrush(QtGui.QColor(25, 80, 0, 160))
-        qp.drawRect(0, 0, 300, 24)
+            def scoreText(self, event, qp):
+                qp.setPen(QtGui.QColor(255, 255, 255))
+                qp.setFont(QtGui.QFont('Decorative', 10))
+                qp.drawText(8, 17, "SCORE: " + str(self.score))
+                qp.drawText(195, 17, "HIGHSCORE: " + str(self.highscore))
 
-    def scoreText(self, event, qp):
-        qp.setPen(QtGui.QColor(255, 255, 255))
-        qp.setFont(QtGui.QFont('Decorative', 10))
-        qp.drawText(8, 17, "SCORE: " + str(self.score))
-        qp.drawText(195, 17, "HIGHSCORE: " + str(self.highscore))
+            def gameOver(self, event, qp):
+                self.highscore = max(self.highscore, self.score)
+                qp.setPen(QtGui.QColor(0, 34, 3))
+                qp.setFont(QtGui.QFont('Decorative', 10))
+                qp.drawText(event.rect(), QtCore.Qt.AlignCenter, "GAME OVER")
+                qp.setFont(QtGui.QFont('Decorative', 8))
+                qp.drawText(80, 170, "press space to play again")
 
-    def gameOver(self, event, qp):
-        self.highscore = max(self.highscore, self.score)
-        qp.setPen(QtGui.QColor(0, 34, 3))
-        qp.setFont(QtGui.QFont('Decorative', 10))
-        qp.drawText(event.rect(), QtCore.Qt.AlignCenter, "GAME OVER")
-        qp.setFont(QtGui.QFont('Decorative', 8))
-        qp.drawText(80, 170, "press space to play again")
+            def checkStatus(self, x, y):
+                if y > 288 or x > 288 or x < 0 or y < 24:
+                    self.pause()
+                    self.isPaused = True
+                    self.isOver = True
+                    return False
+                elif self.snakeArray[0] in self.snakeArray[1:len(self.snakeArray)]:
+                    self.pause()
+                    self.isPaused = True
+                    self.isOver = True
+                    return False
+                elif self.y == self.foody and self.x == self.foodx:
+                    self.FoodPlaced = False
+                    self.score += 1
+                    return True
+                elif self.score >= 573:
+                    print('a')
+                    self.snakeArray.pop()
+                    return True
 
-    def checkStatus(self, x, y):
-        if y > 288 or x > 288 or x < 0 or y < 24:
-            self.pause()
-            self.isPaused = True
-            self.isOver = True
-            return False
-        elif self.snakeArray[0] in self.snakeArray[1:len(self.snakeArray)]:
-            self.pause()
-            self.isPaused = True
-            self.isOver = True
-            return False
-        elif self.y == self.foody and self.x == self.foodx:
-            self.FoodPlaced = False
-            self.score += 1
-            return True
-        elif self.score >= 573:
-            print('a')
-            self.snakeArray.pop()
-            return True
+            def placeFood(self, qp):
+                if self.FoodPlaced == False:
+                    self.foodx = randrange(24)*12
+                    self.foody = randrange(2, 24)*12
+                    if not [self.foodx, self.foody] in self.snakeArray:
+                        self.FoodPlaced = True;
+                qp.setBrush(QtGui.QColor(80, 180, 0, 160))
+                qp.drawRect(self.foodx, self.foody, 12, 12)
 
-    def placeFood(self, qp):
-        if self.FoodPlaced == False:
-            self.foodx = randrange(24)*12
-            self.foody = randrange(2, 24)*12
-            if not [self.foodx, self.foody] in self.snakeArray:
-                self.FoodPlaced = True;
-        qp.setBrush(QtGui.QColor(80, 180, 0, 160))
-        qp.drawRect(self.foodx, self.foody, 12, 12)
+            def drawSnake(self, qp):
+                qp.setPen(QtCore.Qt.NoPen)
+                qp.setBrush(QtGui.QColor(255, 80, 0, 255))
+                for i in self.snakeArray:
+                    qp.drawRect(i[0], i[1], 12, 12)
 
-    def drawSnake(self, qp):
-        qp.setPen(QtCore.Qt.NoPen)
-        qp.setBrush(QtGui.QColor(255, 80, 0, 255))
-        for i in self.snakeArray:
-            qp.drawRect(i[0], i[1], 12, 12)
-
-    def timerEvent(self, event):
-        if event.timerId() == self.timer.timerId():
-            self.direction(self.lastKeyPress)
-            self.repaint()
-        else:
-            QtGui.QFrame.timerEvent(self, event)
+            def timerEvent(self, event):
+                if event.timerId() == self.timer.timerId():
+                    self.direction(self.lastKeyPress)
+                    self.repaint()
+                else:
+                    QtGui.QFrame.timerEvent(self, event)
 
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = Snake()
-    ex.show()
-    sys.exit(app.exec())
+        if __name__ == '__main__':
+            app = QApplication(sys.argv)
+            ex = Snake()
+            ex.show()
+            sys.exit(app.exec())
 
 
 class ThirdGame(QMainWindow):
