@@ -4,15 +4,20 @@ from random import choice, randrange
 from PyQt5 import uic
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QPalette, QBrush
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton
+background_image_path = 'data\\обой2.jpg'
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi('data\\MainWindow.ui', self)  # Загрузка ui файла
+        background_image = QPixmap(background_image_path)
+        palette = QPalette()
+        palette.setBrush(QPalette.Background, QBrush(background_image))
+        self.setPalette(palette)
         self.btn_first.clicked.connect(self.first)
         self.btn_second.clicked.connect(self.second)
         self.btn_third.clicked.connect(self.third)
@@ -240,41 +245,43 @@ class SecondGame(QMainWindow):
 
     def start(self):
         self.isPaused = False
-        self.timer.start(self.speed, self)
-        self.update()
+        self.timer.start(self.speed, self)  # Активируем таймер, и она будет вызывать
+        self.update()  # функцию timerEvent() через заданный проежуток времени(self.speed)
 
     def eat(self):
         self.eaten = True
         self.coords = self.snakeArray[-1]
         self.update()
 
-    def drawScoreBoard(self, qp):
+    def drawScoreBoard(self, qp):  # Рисуем доску очков
         qp.setPen(QtCore.Qt.NoPen)
-        qp.setBrush(QtGui.QColor(25, 80, 0, 160))
-        qp.drawRect(0, 0, 300, 24)
+        qp.setBrush(QtGui.QColor(25, 80, 0, 160))  # Задаем цвет
+        qp.drawRect(0, 0, 300, 24)  # Рисуем прямоугольник
 
-    def scoreText(self, qp):
-        qp.setPen(QtGui.QColor(255, 255, 255))
-        qp.setFont(QtGui.QFont('Decorative', 10))
-        qp.drawText(8, 17, "SCORE: " + str(self.score))
-        qp.drawText(195, 17, "HIGH SCORE: " + str(self.highscore))
+    def scoreText(self, qp):  # Табло очков
+        qp.setPen(QtGui.QColor(255, 255, 255))  # Задаем цвет
+        qp.setFont(QtGui.QFont('Decorative', 10))  # Задаем шрифт
+        qp.drawText(8, 17, "SCORE: " + str(self.score))  # Пишем текст и количество очков
+        qp.drawText(195, 17, "HIGH SCORE: " + str(self.highscore))  # Пишем текст и рекорд
 
     def gameOver(self, event, qp):
-        self.highscore = max(self.highscore, self.score)
-        qp.setPen(QtGui.QColor(0, 34, 3))
-        qp.setFont(QtGui.QFont('Decorative', 10))
-        qp.drawText(event.rect(), QtCore.Qt.AlignCenter, "GAME OVER")
-        qp.setFont(QtGui.QFont('Decorative', 8))
-        qp.drawText(80, 170, "press space to play again")
+        self.highscore = max(self.highscore, self.score)  # Устанавливаем рекорд
+        qp.setPen(QtGui.QColor(0, 34, 3))  # Задаем цвет
+        qp.setFont(QtGui.QFont('Decorative', 10))  # Устанавливаем шрифт и размер
+        qp.drawText(event.rect(), QtCore.Qt.AlignCenter, "GAME OVER")  # Пишем текст
+        qp.setFont(QtGui.QFont('Decorative', 8))  # Изменяем размер текста
+        qp.drawText(80, 170, "press space to play again")  # Пишем текст
 
-    def checkStatus(self, coords):
+    def checkStatus(self, coords):  # Проверка статуса
         x, y = coords
         if y > 22 or x > 24 or x < 0 or y < 0 or self.snakeArray[0] in self.snakeArray[1:]:
+            # Если змея за пределами поля, то заканчиваем игру
             self.pause()
             self.isPaused = True
             self.isOver = True
             return False
         elif x == self.foodx and y == self.foody:
+            # Если змея съела еду, то увеличаем количество очков, и вызываем метод eat()
             self.FoodPlaced = False
             self.score += 1
             self.eat()
@@ -284,26 +291,24 @@ class SecondGame(QMainWindow):
             self.snakeArray.pop()
             return True
 
-    def drawFood(self, qp):
-        if not self.FoodPlaced:
-            self.foodx = randrange(25)
+    def drawFood(self, qp):  # Рисует "еду" для змейки
+        if not self.FoodPlaced:  # Если "еды" нет, то размещаем новую "еду" в случайном месте
+            self.foodx = randrange(25)  # Задаем случайные координаты
             self.foody = randrange(23)
-            if not [self.foodx, self.foody] in self.snakeArray:
-                self.FoodPlaced = True
-        qp.setBrush(QtGui.QColor(80, 180, 0, 160))
-        qp.drawRect(self.foodx * 12, 24 + self.foody * 12, 12, 12)
+            if not [self.foodx, self.foody] in self.snakeArray:  # Если еда не находится в
+                self.FoodPlaced = True  # той же клетке, что и змея, то рисуем еду
+        qp.setBrush(QtGui.QColor(80, 180, 0, 160))  # Задаем цвет
+        qp.drawRect(self.foodx * 12, 24 + self.foody * 12, 12, 12)  # Рисуем
 
-    def drawSnake(self, qp):
+    def drawSnake(self, qp):  # Рисует змею
         qp.setPen(QtCore.Qt.NoPen)
-        qp.setBrush(QtGui.QColor(255, 80, 0, 255))
+        qp.setBrush(QtGui.QColor(255, 80, 0, 255))  # Устанавливаем цвет
         for i in self.snakeArray:
-            qp.drawRect(i[0] * 12, 24 + i[1] * 12, 12, 12)
+            qp.drawRect(i[0] * 12, 24 + i[1] * 12, 12, 12)  # Рисуем каждый квадрат, в котором
+            # находится  змея
 
-    def timerEvent(self, event):
-        if event.timerId() == self.timer.timerId():
-            self.update()
-        else:
-            QtGui.QFrame.timerEvent(self, event)
+    def timerEvent(self, event):  # отвечает за смену кадров в игре
+        self.update()
 
 
 class ThirdGame(QMainWindow):
