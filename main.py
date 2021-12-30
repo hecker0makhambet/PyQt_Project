@@ -1,7 +1,8 @@
 import sys
 import sqlite3
-from random import choice
+from random import choice, randrange
 from PyQt5 import uic
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication
@@ -159,7 +160,150 @@ class FirstGame(QMainWindow):
 class SecondGame(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('data\\Secondgame.ui', self)
+        self.initUI()
+
+    def initUI(self):
+        self.highscore = 0
+        self.newGame()
+        self.setStyleSheet("QWidget { background: #A9F5D0 }")
+        self.setFixedSize(300, 300)
+        self.setWindowTitle('Snake')
+        self.show()
+
+    def newGame(self):
+        self.score = 0
+        self.timer = QtCore.QBasicTimer()
+        self.lastPressedKey = 2
+        self.k = 1
+        self.l = 0
+        self.snakeArray = [[3, 0], [2, 0], [1, 0], [0, 0]]
+        self.foodx = 0
+        self.foody = 0
+        self.eaten = False
+        self.isPaused = False
+        self.isOver = False
+        self.FoodPlaced = False
+        self.speed = 100
+        self.start()
+
+    def paintEvent(self, event):
+        qp = QtGui.QPainter()
+        qp.begin(self)
+        for i, j in enumerate(self.snakeArray):
+            self.snakeArray[0], self.snakeArray[i] = self.snakeArray[i], self.snakeArray[0]
+        self.snakeArray[0] = [self.snakeArray[1][0] + self.k, self.snakeArray[1][1] + self.l]
+        if self.checkStatus(self.snakeArray[0]):
+            pass
+        else:
+            pass
+        if self.eaten:
+            self.snakeArray.append(self.coords)
+        self.eaten = False
+        self.drawScoreBoard(qp)
+        self.drawFood(qp)
+        self.drawSnake(qp)
+        self.scoreText(qp)
+        if self.isOver:
+            self.gameOver(event, qp)
+        qp.end()
+
+    def keyPressEvent(self, event):
+        lastPressedKey = 0
+        if event.key() == QtCore.Qt.Key_Down:
+            self.l = 1
+            self.k = 0
+            lastPressedKey = -1
+        elif event.key() == QtCore.Qt.Key_Up:
+            self.l = -1
+            self.k = 0
+            lastPressedKey = 1
+        elif event.key() == QtCore.Qt.Key_Right:
+            self.k = 1
+            self.l = 0
+            lastPressedKey = 2
+        elif event.key() == QtCore.Qt.Key_Left:
+            self.k = -1
+            self.l = 0
+            lastPressedKey = -2
+        elif event.key() == QtCore.Qt.Key_P:
+            self.start()
+        elif event.key() == QtCore.Qt.Key_Space and self.isOver:
+            self.newGame()
+        elif event.key() == QtCore.Qt.Key_Escape:
+            self.close()
+        self.lastPressedKey = lastPressedKey
+
+    def pause(self):
+        self.isPaused = True
+        self.timer.stop()
+        self.update()
+
+    def start(self):
+        self.isPaused = False
+        self.timer.start(self.speed, self)
+        self.update()
+
+    def eat(self):
+        self.eaten = True
+        self.coords = self.snakeArray[-1]
+        self.update()
+
+    def drawScoreBoard(self, qp):
+        qp.setPen(QtCore.Qt.NoPen)
+        qp.setBrush(QtGui.QColor(25, 80, 0, 160))
+        qp.drawRect(0, 0, 300, 24)
+
+    def scoreText(self, qp):
+        qp.setPen(QtGui.QColor(255, 255, 255))
+        qp.setFont(QtGui.QFont('Decorative', 10))
+        qp.drawText(8, 17, "SCORE: " + str(self.score))
+        qp.drawText(195, 17, "HIGH SCORE: " + str(self.highscore))
+
+    def gameOver(self, event, qp):
+        self.highscore = max(self.highscore, self.score)
+        qp.setPen(QtGui.QColor(0, 34, 3))
+        qp.setFont(QtGui.QFont('Decorative', 10))
+        qp.drawText(event.rect(), QtCore.Qt.AlignCenter, "GAME OVER")
+        qp.setFont(QtGui.QFont('Decorative', 8))
+        qp.drawText(80, 170, "press space to play again")
+
+    def checkStatus(self, coords):
+        x, y = coords
+        if y > 22 or x > 24 or x < 0 or y < 0 or self.snakeArray[0] in self.snakeArray[1:]:
+            self.pause()
+            self.isPaused = True
+            self.isOver = True
+            return False
+        elif x == self.foodx and y == self.foody:
+            self.FoodPlaced = False
+            self.score += 1
+            self.eat()
+            return True
+        elif self.score >= 573:
+            print('a')
+            self.snakeArray.pop()
+            return True
+
+    def drawFood(self, qp):
+        if not self.FoodPlaced:
+            self.foodx = randrange(25)
+            self.foody = randrange(23)
+            if not [self.foodx, self.foody] in self.snakeArray:
+                self.FoodPlaced = True
+        qp.setBrush(QtGui.QColor(80, 180, 0, 160))
+        qp.drawRect(self.foodx * 12, 24 + self.foody * 12, 12, 12)
+
+    def drawSnake(self, qp):
+        qp.setPen(QtCore.Qt.NoPen)
+        qp.setBrush(QtGui.QColor(255, 80, 0, 255))
+        for i in self.snakeArray:
+            qp.drawRect(i[0] * 12, 24 + i[1] * 12, 12, 12)
+
+    def timerEvent(self, event):
+        if event.timerId() == self.timer.timerId():
+            self.update()
+        else:
+            QtGui.QFrame.timerEvent(self, event)
 
 
 class ThirdGame(QMainWindow):
