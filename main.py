@@ -8,6 +8,7 @@ from PyQt5.QtGui import QPixmap, QPalette, QBrush
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton
 background_image_path = 'data\\обой2.jpg'
+#  Тут был Дархан
 
 
 class MainWindow(QMainWindow):
