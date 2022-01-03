@@ -321,7 +321,112 @@ class ThirdGame(QMainWindow):
 class AmazingQuest(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.connect = sqlite3.connect('data\\AmazingQuest.db')
+        self.cur = self.connect.cursor()
+        self.initUI()
+
+    def initUI(self):
         uic.loadUi('data\\AmazingQuest.ui', self)
+        self.btn_start.clicked.connect(self.start)
+        self.btn_endings.clicked.connect(self.endings)
+        self.btn_settings.clicked.connect(self.settings)
+        self.btn_quit.clicked.connect(self.quit)
+
+    def start(self):
+        uic.loadUi('data\\AmazingQuestStart.ui', self)
+        self.btn_1.clicked.connect(self.action1)
+        self.btn_2.clicked.connect(self.action2)
+        self.btn_3.clicked.connect(self.action3)
+        self.btn_menu.clicked.connect(self.initUI)
+        self.btn_restart.clicked.connect(self.start)
+        self.btn_ending.clicked.connect(self.show_ending)
+        self.page = 1
+        self.id = 1
+        self.ending_id = 0
+        self.new_page()
+
+    def new_page(self):
+        self.ending_info.hide()
+        self.btn_menu.hide()
+        self.btn_restart.hide()
+        self.btn_ending.hide()
+        self.btn_1.show()
+        self.btn_2.show()
+        self.btn_3.show()
+        self.page = self.cur.execute(f"""SELECT page_id FROM pages
+        WHERE page_id={self.id}
+        """)
+        self.page = list(self.page)
+        if self.page:
+            self.page = int(self.page[0][0])
+            self.text_file = open(f'data\\situations\\{self.page}.txt', encoding='utf-8')
+            self.text = self.text_file.read().split('\n-----\n')
+            self.situation = self.text[0]
+            self.act1, self.id1 = self.text[1].split(' --- ')
+            self.act2, self.id2 = self.text[2].split(' --- ')
+            self.act3, self.id3 = self.text[3].split(' --- ')
+            self.situation_text.setPlainText(self.situation)
+            self.btn_1.setText(self.act1)
+            self.btn_2.setText(self.act2)
+            self.btn_3.setText(self.act3)
+            self.text_file.close()
+        else:
+            print("ERROR")
+
+    def action1(self):
+        if not self.id1.isdigit():
+            self.ending_id = int(self.id1[1:])
+            self.ending()
+            return 0
+        self.id = int(self.id1)
+        self.new_page()
+
+    def action2(self):
+        if not self.id2.isdigit():
+            self.ending_id = int(self.id2[1:])
+            self.ending()
+            return 0
+        self.id = int(self.id2)
+        self.new_page()
+
+    def action3(self):
+        if not self.id3.isdigit():
+            self.ending_id = int(self.id3[1:])
+            self.ending()
+            return 0
+        self.id = int(self.id3)
+        self.new_page()
+
+    def ending(self):
+        self.btn_1.hide()
+        self.btn_2.hide()
+        self.btn_3.hide()
+        self.btn_menu.show()
+        self.btn_restart.show()
+        self.btn_ending.show()
+        self.text_file = open(f'data\\endings\\{self.ending_id}.txt', encoding='utf-8')
+        self.text = self.text_file.read().split('\n-----\n')
+        self.situation_text.setPlainText(self.text[0])
+        self.btn_ending.setText(str(self.ending_id))
+        if not list(self.cur.execute(f"""SELECT ending_id FROM 'Opened endings'
+        WHERE ending_id={self.ending_id}""")):
+            self.cur.execute(f"""INSERT INTO 'Opened endings'(ending_id) VALUES({self.ending_id})
+            """)
+        self.connect.commit()
+        self.text_file.close()
+
+    def show_ending(self):
+        self.ending_info.show()
+        self.ending_info.setPlainText(self.text[1])
+
+    def endings(self):
+        uic.loadUi('data\\AmazingQuestEndings.ui', self)
+
+    def settings(self):
+        uic.loadUi('data\\AmazingQuestSettings.ui', self)
+
+    def quit(self):
+        self.close()
 
 
 if __name__ == '__main__':
