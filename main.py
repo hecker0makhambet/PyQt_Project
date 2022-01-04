@@ -323,9 +323,13 @@ class AmazingQuest(QMainWindow):
         super().__init__()
         self.connect = sqlite3.connect('data\\AmazingQuest.db')
         self.cur = self.connect.cursor()
+        self.ending_btns = []
         self.initUI()
 
     def initUI(self):
+        if self.ending_btns != []:
+            for i in range(20):
+                self.ending_btns[i].hide()
         uic.loadUi('data\\AmazingQuest.ui', self)
         self.btn_start.clicked.connect(self.start)
         self.btn_endings.clicked.connect(self.endings)
@@ -333,6 +337,8 @@ class AmazingQuest(QMainWindow):
         self.btn_quit.clicked.connect(self.quit)
 
     def start(self):
+        self.cur.execute("""DELETE FROM Log""")
+        self.connect.commit()
         uic.loadUi('data\\AmazingQuestStart.ui', self)
         self.btn_1.clicked.connect(self.action1)
         self.btn_2.clicked.connect(self.action2)
@@ -340,12 +346,12 @@ class AmazingQuest(QMainWindow):
         self.btn_menu.clicked.connect(self.initUI)
         self.btn_restart.clicked.connect(self.start)
         self.btn_ending.clicked.connect(self.show_ending)
-        self.page = 1
         self.id = 1
         self.ending_id = 0
         self.new_page()
 
     def new_page(self):
+        self.connect.commit()
         self.ending_info.hide()
         self.btn_menu.hide()
         self.btn_restart.hide()
@@ -353,27 +359,20 @@ class AmazingQuest(QMainWindow):
         self.btn_1.show()
         self.btn_2.show()
         self.btn_3.show()
-        self.page = self.cur.execute(f"""SELECT page_id FROM pages
-        WHERE page_id={self.id}
-        """)
-        self.page = list(self.page)
-        if self.page:
-            self.page = int(self.page[0][0])
-            self.text_file = open(f'data\\situations\\{self.page}.txt', encoding='utf-8')
-            self.text = self.text_file.read().split('\n-----\n')
-            self.situation = self.text[0]
-            self.act1, self.id1 = self.text[1].split(' --- ')
-            self.act2, self.id2 = self.text[2].split(' --- ')
-            self.act3, self.id3 = self.text[3].split(' --- ')
-            self.situation_text.setPlainText(self.situation)
-            self.btn_1.setText(self.act1)
-            self.btn_2.setText(self.act2)
-            self.btn_3.setText(self.act3)
-            self.text_file.close()
-        else:
-            print("ERROR")
+        self.text_file = open(f'data\\situations\\{self.id}.txt', encoding='utf-8')
+        self.text = self.text_file.read().split('\n-----\n')
+        self.situation = self.text[0]
+        self.act1, self.id1 = self.text[1].split(' --- ')
+        self.act2, self.id2 = self.text[2].split(' --- ')
+        self.act3, self.id3 = self.text[3].split(' --- ')
+        self.situation_text.setPlainText(self.situation)
+        self.btn_1.setText(self.act1)
+        self.btn_2.setText(self.act2)
+        self.btn_3.setText(self.act3)
+        self.text_file.close()
 
     def action1(self):
+        self.cur.execute("""INSERT INTO Log(action) VALUES(1)""")
         if not self.id1.isdigit():
             self.ending_id = int(self.id1[1:])
             self.ending()
@@ -382,6 +381,7 @@ class AmazingQuest(QMainWindow):
         self.new_page()
 
     def action2(self):
+        self.cur.execute("""INSERT INTO Log(action) VALUES(2)""")
         if not self.id2.isdigit():
             self.ending_id = int(self.id2[1:])
             self.ending()
@@ -390,6 +390,7 @@ class AmazingQuest(QMainWindow):
         self.new_page()
 
     def action3(self):
+        self.cur.execute("""INSERT INTO Log(action) VALUES(3)""")
         if not self.id3.isdigit():
             self.ending_id = int(self.id3[1:])
             self.ending()
@@ -412,8 +413,15 @@ class AmazingQuest(QMainWindow):
         WHERE ending_id={self.ending_id}""")):
             self.cur.execute(f"""INSERT INTO 'Opened endings'(ending_id) VALUES({self.ending_id})
             """)
+            self.text_file.close()
+            text = open(f'data\\endings\\{self.ending_id}.txt', encoding='utf-8', mode='w')
+            text.seek(-1)
+            text.write(''.join(list(self.cur.execute("""SELECT action FROM Log"""))))
+            text.close()
+        else:
+            self.text_file.close()
         self.connect.commit()
-        self.text_file.close()
+
 
     def show_ending(self):
         self.ending_info.show()
@@ -421,6 +429,41 @@ class AmazingQuest(QMainWindow):
 
     def endings(self):
         uic.loadUi('data\\AmazingQuestEndings.ui', self)
+        self.btn_menu.clicked.connect(self.initUI)
+        self.btn_return.clicked.connect(self.hide_ending)
+        self.ending_info.hide()
+        self.btn_return.hide()
+        self.ending_btns = []
+        for i in range(18):
+            self.ending_btns.append(QPushButton(str(i + 1), self))
+            self.ending_btns[-1].move(i % 6 * 60 + 80, i // 6 * 60 + 30)
+        self.ending_btns.append(QPushButton('19', self))
+        self.ending_btns[-1].move(170, 220)
+        self.ending_btns.append(QPushButton('20', self))
+        self.ending_btns[-1].move(290, 220)
+        for i in range(20):
+            self.ending_btns[i].clicked.connect(self.show_ending_2)
+            self.ending_btns[i].resize(50, 50)
+            self.ending_btns[i].show()
+
+    def show_ending_2(self):
+        self.ending_info.show()
+        for i in range(20):
+            self.ending_btns[i].hide()
+            if self.sender() == self.ending_btns[i]:
+                if list(self.cur.execute(f"""SELECT ending_id FROM 'Opened endings'
+                WHERE ending_id={i + 1}""")):
+                    text = open(f'data\\endings\\{i + 1}.txt', encoding='utf-8')
+                    self.ending_info.setPlainText(text.read().split('\n-----\n')[1])
+                else:
+                    self.ending_info.setPlainText('Концовка еще не открыта')
+        self.btn_return.show()
+
+    def hide_ending(self):
+        self.ending_info.hide()
+        for i in range(20):
+            self.ending_btns[i].show()
+        self.btn_return.hide()
 
     def settings(self):
         uic.loadUi('data\\AmazingQuestSettings.ui', self)
