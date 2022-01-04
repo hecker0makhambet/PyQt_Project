@@ -413,15 +413,13 @@ class AmazingQuest(QMainWindow):
         WHERE ending_id={self.ending_id}""")):
             self.cur.execute(f"""INSERT INTO 'Opened endings'(ending_id) VALUES({self.ending_id})
             """)
-            self.text_file.close()
-            text = open(f'data\\endings\\{self.ending_id}.txt', encoding='utf-8', mode='w')
-            text.seek(-1)
-            text.write(''.join(list(self.cur.execute("""SELECT action FROM Log"""))))
+            text = open(f'data\\endings\\{self.ending_id}.txt', 'w', encoding='utf-8')
+            a = '\n-----\n'.join(self.text) + \
+                '\n-----\n' + ''.join([str(i[0]) for i in list(self.cur.execute("""SELECT action FROM Log"""))])
+            print(a, end='', file=text)
             text.close()
-        else:
-            self.text_file.close()
+        self.text_file.close()
         self.connect.commit()
-
 
     def show_ending(self):
         self.ending_info.show()
@@ -454,7 +452,8 @@ class AmazingQuest(QMainWindow):
                 if list(self.cur.execute(f"""SELECT ending_id FROM 'Opened endings'
                 WHERE ending_id={i + 1}""")):
                     text = open(f'data\\endings\\{i + 1}.txt', encoding='utf-8')
-                    self.ending_info.setPlainText(text.read().split('\n-----\n')[1])
+                    a = text.read().split('\n-----\n')
+                    self.ending_info.setPlainText(a[1] + '\nКлюч к этой концовке:' + a[-1])
                 else:
                     self.ending_info.setPlainText('Концовка еще не открыта')
         self.btn_return.show()
