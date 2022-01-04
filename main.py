@@ -8,7 +8,8 @@ from PyQt5.QtGui import QPixmap, QPalette, QBrush
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton
 background_image_path = 'data\\обой2.jpg'
-#  Тут был Дархан Тыныштык1
+# 24 - Химия
+# 25 - Дротики
 
 
 class MainWindow(QMainWindow):
@@ -142,13 +143,17 @@ class FirstGame(QMainWindow):
         self.ufo2.move(self.ufo2.x() % 600, self.ufo2.y() % 600)  # ничего не изменится
         self.ufo3.move(self.ufo3.x() % 600, self.ufo3.y() % 600)
         self.ufo4.move(self.ufo4.x() % 600, self.ufo4.y() % 600)
-        if self.check(self.hero.x(), self.hero.y(), self.ufo1.x(), self.ufo1.y(), self.hero.size(), self.ufo1.size()):
+        if self.checkStatus(self.hero.x(), self.hero.y(), self.ufo1.x(),
+                            self.ufo1.y(), self.hero.size(), self.ufo1.size()):
             self.ufo1.hide()
-        if self.check(self.hero.x(), self.hero.y(), self.ufo2.x(), self.ufo2.y(), self.hero.size(), self.ufo2.size()):
+        if self.checkStatus(self.hero.x(), self.hero.y(), self.ufo2.x(),
+                            self.ufo2.y(), self.hero.size(), self.ufo2.size()):
             self.ufo2.hide()
-        if self.check(self.hero.x(), self.hero.y(), self.ufo3.x(), self.ufo3.y(), self.hero.size(), self.ufo3.size()):
+        if self.checkStatus(self.hero.x(), self.hero.y(), self.ufo3.x(),
+                            self.ufo3.y(), self.hero.size(), self.ufo3.size()):
             self.ufo3.hide()
-        if self.check(self.hero.x(), self.hero.y(), self.ufo4.x(), self.ufo4.y(), self.hero.size(), self.ufo4.size()):
+        if self.checkStatus(self.hero.x(), self.hero.y(), self.ufo4.x(),
+                            self.ufo4.y(), self.hero.size(), self.ufo4.size()):
             self.ufo4.hide()
         if self.ufo1.isHidden() and self.ufo2.isHidden() and self.ufo3.isHidden() and self.ufo4.isHidden():
             self.label.show()
@@ -157,7 +162,7 @@ class FirstGame(QMainWindow):
             self.btn_start.setEnabled(True)
             self.btn_start.show()
 
-    def check(self, x1, y1, x2, y2, size1, size2):
+    def checkStatus(self, x1, y1, x2, y2, size1, size2):
         if x1 <= x2 <= x1 + size1.width() and y1 <= y2 <= y1 + size1.height():
             return True
         return False
@@ -327,7 +332,7 @@ class AmazingQuest(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        if self.ending_btns != []:
+        if self.ending_btns:
             for i in range(20):
                 self.ending_btns[i].hide()
         uic.loadUi('data\\AmazingQuest.ui', self)
