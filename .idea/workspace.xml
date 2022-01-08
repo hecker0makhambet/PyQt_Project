@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1dd77563-e9c9-4561-b25f-5d9c47e51e64" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/data/endings/2.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/endings/2.txt" afterDir="false" />
-    </list>
+    <list default="true" id="1dd77563-e9c9-4561-b25f-5d9c47e51e64" name="Changes" comment="Изменение и добавление новых данных для квеста&#10;Доработка интерфейса&#10;Презентация и документация проекта" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -11,6 +9,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="ProjectId" id="236LiXrmmgLFXe9ELqSQA7cq56a" />
   <component name="ProjectViewState">
@@ -30,6 +29,29 @@
       <option name="presentableId" value="Default" />
       <updated>1641049721237</updated>
     </task>
+    <task id="LOCAL-00001" summary="Изменение и добавление новых данных для квеста&#10;Доработка интерфейса&#10;Презентация и документация проекта">
+      <created>1641310661236</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1641310661236</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Изменение и добавление новых данных для квеста&#10;Доработка интерфейса&#10;Презентация и документация проекта" />
+    <option name="LAST_COMMIT_MESSAGE" value="Изменение и добавление новых данных для квеста&#10;Доработка интерфейса&#10;Презентация и документация проекта" />
   </component>
 </project>
