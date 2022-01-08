@@ -4,52 +4,66 @@ from random import choice, randrange
 from PyQt5 import uic
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QPalette, QBrush
+from PyQt5.QtGui import QPixmap, QPalette, QBrush, QFont
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton
 background_image_path = 'data\\обой2.jpg'
-# 24 - Химия
-# 25 - Дротики
+# Нужно написать комментарии
+# Нужно добавить музыку
+# Нужно добавить задний фон
+# Нужно добавить настройки к квесту
+# Нужно дополнить сюжет квеста
+# Нужно закончить квест
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi('data\\MainWindow.ui', self)  # Загрузка ui файла
-        background_image = QPixmap(background_image_path)
+        background_image = QPixmap(background_image_path) # Установка фонового изображения
         palette = QPalette()
         palette.setBrush(QPalette.Background, QBrush(background_image))
         self.setPalette(palette)
-        self.btn_first.clicked.connect(self.first)
+        self.btn_first.clicked.connect(self.first) # Настройка кнопок
         self.btn_second.clicked.connect(self.second)
         self.btn_third.clicked.connect(self.third)
         self.btn_quest.clicked.connect(self.quest)
+        self.btn_first.setText('Catch the UFO!') # Установка текста кнопок
+        self.btn_second.setText('Snake')
+        self.btn_third.setText('Ping Pong')
 
     def first(self):
         self.firstwindow = FirstGame()  # Создание окна первой игры
         self.firstwindow.show()
 
     def second(self):
-        self.secondwindow = SecondGame()  # Создание окна второйой игры
+        self.secondwindow = SecondGame()  # Создание окна второй игры
         self.secondwindow.show()
 
     def third(self):
-        self.thirdwindow = ThirdGame()  # Создание окна третей игры
+        self.thirdwindow = ThirdGame()  # Создание окна третьей игры
         self.thirdwindow.show()
 
     def quest(self):
-        self.questwindow = AmazingQuest()  # Создание окна супер-квеста
+        self.questwindow = AmazingQuest()  # Создание окна квеста
         self.questwindow.show()
 
 
 class FirstGame(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.background = QLabel(self)
+        self.background.resize(600, 600)
+        self.background.setPixmap(QPixmap('data\\белый фон.jpg'))  # Установка белого фона
         uic.loadUi('data\\FirstGame.ui', self)  # Загрузка ui файла
+        self.setWindowTitle('Поймай НЛО!')  # Установка названия окна
         self.im1 = QPixmap('data\\UFO1.png')  # Загрузка изоображения НЛО
-        self.im2 = QPixmap('data\\main_hero.png')  # Загрузка изображения игрока
+        self.hero_up = QPixmap('data\\main_hero_up.png')  # Загрузка изображений игрока
+        self.hero_down = QPixmap('data\\main_hero_down.png')
+        self.hero_right = QPixmap('data\\main_hero_right.png')
+        self.hero_left = QPixmap('data\\main_hero_left.png')
         self.hero = QLabel(self)
-        self.hero.setPixmap(self.im2)  # Создание главного персонажа
+        self.hero.setPixmap(self.hero_up)  # Создание главного персонажа
         self.hero.resize(74, 58)
         self.ufo1 = QLabel(self)
         self.ufo1.setPixmap(self.im1)  # Создание НЛО
@@ -64,15 +78,15 @@ class FirstGame(QMainWindow):
         self.ufo3.hide()
         self.ufo4.hide()
         self.hero.hide()
-        self.bx1 = -10
-        self.by1 = 0
-        self.bx2 = 0
-        self.by2 = 10
-        self.bx3 = 0
-        self.by3 = -10
-        self.bx4 = 10
-        self.by4 = 0
-        self.cnt = 0
+        self.bx1 = -10  # Движение НЛО1 по оси х
+        self.by1 = 0  # Движение НЛО1 по оси у
+        self.bx2 = 0  # Движение НЛО2 по оси х
+        self.by2 = 10  # Движение НЛО2 по оси у
+        self.bx3 = 0  # Движение НЛО3 по оси х
+        self.by3 = -10  # Движение НЛО3 по оси у
+        self.bx4 = 10  # Движение НЛО4 по оси х
+        self.by4 = 0  # Движение НЛО4 по оси у
+        self.cnt = 0  # Счетчик
         self.label.hide()
         self.btn_start.clicked.connect(self.run)
 
@@ -96,27 +110,31 @@ class FirstGame(QMainWindow):
         self.ufo4.show()
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Right:
+        if event.key() == Qt.Key_Right:  # Движение игрока
             self.hero.move(self.hero.x() + 10, self.hero.y())
+            self.hero.setPixmap(self.hero_right)  # Смена изображения в соответствии с направлением
         if event.key() == Qt.Key_Left:
             self.hero.move(self.hero.x() - 10, self.hero.y())
+            self.hero.setPixmap(self.hero_left)
         if event.key() == Qt.Key_Up:
             self.hero.move(self.hero.x(), self.hero.y() - 10)
+            self.hero.setPixmap(self.hero_up)
         if event.key() == Qt.Key_Down:
             self.hero.move(self.hero.x(), self.hero.y() + 10)
-        if event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left]:
+            self.hero.setPixmap(self.hero_down)
+        if event.key() in [Qt.Key_Up, Qt.Key_Down, Qt.Key_Right, Qt.Key_Left]:  # Движение НЛО
             self.ufo1.move(self.ufo1.x() + self.bx1, self.ufo1.y() + self.by1)
             self.ufo2.move(self.ufo2.x() + self.bx2, self.ufo2.y() + self.by2)
             self.ufo3.move(self.ufo3.x() + self.bx3, self.ufo3.y() + self.by3)
             self.ufo4.move(self.ufo4.x() + self.bx4, self.ufo4.y() + self.by4)
             self.cnt += 1
-        if self.cnt % 100 >= choice(range(1000)):
+        if self.cnt % 100 >= choice(range(100)):  # Смена направления движения
             self.bx1, self.by1 = -self.by1, -self.bx1
-        if self.cnt % 100 >= choice(range(1000)):
+        if self.cnt % 100 >= choice(range(100)):
             self.bx2, self.by2 = -self.by2, -self.bx2
-        if self.cnt % 100 >= choice(range(1000)):
+        if self.cnt % 100 >= choice(range(100)):
             self.bx3, self.by3 = -self.by3, -self.bx3
-        if self.cnt % 100 >= choice(range(1000)):
+        if self.cnt % 100 >= choice(range(100)):
             self.bx4, self.by4 = -self.by4, -self.bx4
         if self.ufo1.y() < 0:  # Проверка координат, за границей ли окна они находятся, если да, то переместить их
             self.ufo1.move(self.ufo1.x(), self.ufo1.y() + 600)  # на территорию окна
@@ -143,8 +161,8 @@ class FirstGame(QMainWindow):
         self.ufo2.move(self.ufo2.x() % 600, self.ufo2.y() % 600)  # ничего не изменится
         self.ufo3.move(self.ufo3.x() % 600, self.ufo3.y() % 600)
         self.ufo4.move(self.ufo4.x() % 600, self.ufo4.y() % 600)
-        if self.checkStatus(self.hero.x(), self.hero.y(), self.ufo1.x(),
-                            self.ufo1.y(), self.hero.size(), self.ufo1.size()):
+        if self.checkStatus(self.hero.x(), self.hero.y(), self.ufo1.x(),  # Проверка, пойман ли НЛО,
+                            self.ufo1.y(), self.hero.size(), self.ufo1.size()):  # если да, то скрыть его
             self.ufo1.hide()
         if self.checkStatus(self.hero.x(), self.hero.y(), self.ufo2.x(),
                             self.ufo2.y(), self.hero.size(), self.ufo2.size()):
@@ -156,13 +174,13 @@ class FirstGame(QMainWindow):
                             self.ufo4.y(), self.hero.size(), self.ufo4.size()):
             self.ufo4.hide()
         if self.ufo1.isHidden() and self.ufo2.isHidden() and self.ufo3.isHidden() and self.ufo4.isHidden():
-            self.label.show()
+            self.label.show()  # Если все НЛО пойманы, то обьявить победу игрока.
             self.hero.hide()
             self.btn_start.setText('RESTART')
             self.btn_start.setEnabled(True)
             self.btn_start.show()
 
-    def checkStatus(self, x1, y1, x2, y2, size1, size2):
+    def checkStatus(self, x1, y1, x2, y2, size1, size2):  # Проверка, пойман ли, НЛО
         if x1 <= x2 <= x1 + size1.width() and y1 <= y2 <= y1 + size1.height():
             return True
         return False
@@ -176,85 +194,70 @@ class SecondGame(QMainWindow):
     def initUI(self):
         self.highscore = 0
         self.newGame()
-        self.setStyleSheet("QWidget { background: #A9F5D0 }")
-        self.setFixedSize(300, 300)
-        self.setWindowTitle('Snake')
+        self.setStyleSheet("QWidget { background: #A9F5D0 }")  # Установка цвета окна
+        self.setFixedSize(300, 300)  # Установка размера окна
+        self.setWindowTitle('Snake')  # Установка названия окна
         self.show()
 
     def newGame(self):
         self.score = 0
         self.timer = QtCore.QBasicTimer()
-        self.lastPressedKey = 2
-        self.k = 1
-        self.l = 0
-        self.snakeArray = [[3, 0], [2, 0], [1, 0], [0, 0]]
-        self.foodx = 0
+        self.k = 1  # Движение змейки по оси х
+        self.l = 0  # Движение змейки по оси у
+        self.snakeArray = [[3, 0], [2, 0], [1, 0], [0, 0]]  # Обьявление начальных координат частей змейки на
+        # клетчатом поле
+        self.foodx = 0  # Координаты еды
         self.foody = 0
-        self.eaten = False
-        self.isPaused = False
-        self.isOver = False
-        self.FoodPlaced = False
-        self.speed = 100
+        self.eaten = False  # Сьедена ли еда
+        self.isPaused = False  # Находится ли игра на паузе
+        self.isOver = False  # Окончена ли игра
+        self.FoodPlaced = False  # Размещена ли еда
+        self.speed = 100  # Скорость змейки
         self.start()
 
     def paintEvent(self, event):
         qp = QtGui.QPainter()
         qp.begin(self)
-        for i, j in enumerate(self.snakeArray):
+        for i, j in enumerate(self.snakeArray):  # Изменение координат змейки
             self.snakeArray[0], self.snakeArray[i] = self.snakeArray[i], self.snakeArray[0]
         self.snakeArray[0] = [self.snakeArray[1][0] + self.k, self.snakeArray[1][1] + self.l]
-        if self.checkStatus(self.snakeArray[0]):
-            pass
-        else:
-            pass
-        if self.eaten:
+        self.checkStatus(self.snakeArray[0])
+        if self.eaten:  # Если змейка сьела еду, удлинить его
             self.snakeArray.append(self.coords)
         self.eaten = False
-        self.drawScoreBoard(qp)
-        self.drawFood(qp)
-        self.drawSnake(qp)
-        self.scoreText(qp)
+        self.drawScoreBoard(qp)  # Рисовка таблицы
+        self.drawFood(qp)  # Рисовка еды
+        self.drawSnake(qp)  # Рисовка змейки
+        self.scoreText(qp)  # Рисовка очков
         if self.isOver:
-            self.gameOver(event, qp)
+            self.gameOver(event, qp)  # Завершение игры
         qp.end()
 
     def keyPressEvent(self, event):
-        lastPressedKey = 0
-        if event.key() == QtCore.Qt.Key_Down:
+        if event.key() == QtCore.Qt.Key_Down:  # Изменение направления движения змейки
             self.l = 1
             self.k = 0
-            lastPressedKey = -1
         elif event.key() == QtCore.Qt.Key_Up:
             self.l = -1
             self.k = 0
-            lastPressedKey = 1
         elif event.key() == QtCore.Qt.Key_Right:
             self.k = 1
             self.l = 0
-            lastPressedKey = 2
         elif event.key() == QtCore.Qt.Key_Left:
             self.k = -1
             self.l = 0
-            lastPressedKey = -2
-        elif event.key() == QtCore.Qt.Key_P:
+        elif event.key() == QtCore.Qt.Key_P:  # Начать новую игру если нажата клавиша Р
             self.start()
-        elif event.key() == QtCore.Qt.Key_Space and self.isOver:
+        elif event.key() == QtCore.Qt.Key_Space and self.isOver:  # Начать новую игру, если нажата клавиша ПРОБЕЛ
             self.newGame()
-        elif event.key() == QtCore.Qt.Key_Escape:
+        elif event.key() == QtCore.Qt.Key_Escape:  # Выйти из игры, если нажата клавиша ESC
             self.close()
-        self.lastPressedKey = lastPressedKey
 
-    def pause(self):
-        self.isPaused = True
-        self.timer.stop()
-        self.update()
-
-    def start(self):
-        self.isPaused = False
+    def start(self):  # Начать новую игру
         self.timer.start(self.speed, self)  # Активируем таймер, и она будет вызывать
         self.update()  # функцию timerEvent() через заданный проежуток времени(self.speed)
 
-    def eat(self):
+    def eat(self):  # Сьесть еду
         self.eaten = True
         self.coords = self.snakeArray[-1]
         self.update()
@@ -277,13 +280,13 @@ class SecondGame(QMainWindow):
         qp.drawText(event.rect(), QtCore.Qt.AlignCenter, "GAME OVER")  # Пишем текст
         qp.setFont(QtGui.QFont('Decorative', 8))  # Изменяем размер текста
         qp.drawText(80, 170, "press space to play again")  # Пишем текст
+        self.timer.stop()  # Остановка таймера
+        self.update()
 
     def checkStatus(self, coords):  # Проверка статуса
         x, y = coords
         if y > 22 or x > 24 or x < 0 or y < 0 or self.snakeArray[0] in self.snakeArray[1:]:
             # Если змея за пределами поля, то заканчиваем игру
-            self.pause()
-            self.isPaused = True
             self.isOver = True
             return False
         elif x == self.foodx and y == self.foody:
@@ -291,10 +294,6 @@ class SecondGame(QMainWindow):
             self.FoodPlaced = False
             self.score += 1
             self.eat()
-            return True
-        elif self.score >= 573:
-            print('a')
-            self.snakeArray.pop()
             return True
 
     def drawFood(self, qp):  # Рисует "еду" для змейки
@@ -320,42 +319,124 @@ class SecondGame(QMainWindow):
 class ThirdGame(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('data\\ThirdGame.ui', self)
+        self.setFixedSize(500, 500)  # Установка размера окна
+        self.player_image = QPixmap('data\\ping_pong_player.png')  # Загрузка изображения игрока
+        self.ball_image = QPixmap('data\\ball.png')  # Загрузка изображения мяча
+        self.score_table = QLabel(self)  # Обьявление таблицы очков
+        self.player1 = QLabel(self)  # Обьявление игрока 1
+        self.player2 = QLabel(self)  # Обьявление игрока 2
+        self.ball = QLabel(self)  # Обьявление мяча
+        self.timer = QtCore.QBasicTimer()
+        self.speed = 25  # Установка скорости
+        self.number_list = [-1, -0.75, -0.5, -0.25, 0.25, 0.5, 0.75, 1]
+        self.ball_moving_kx = choice(self.number_list)  # Движение мяча в случайном направлении по оси х, у
+        self.ball_moving_ky = choice(self.number_list)
+        self.player1_score = 0  # Счет игрока 1
+        self.player2_score = 0  # Счет игрока 2
+        self.initUI()
+        self.new_game()
+
+    def initUI(self):
+        self.score_table.resize(100, 50)  # Изменение размера в соответствии с изображением или шрифтом
+        self.player1.resize(5, 40)
+        self.player2.resize(5, 40)
+        self.ball.resize(22, 22)
+        self.score_table.move(200, 0)  # Растановка обьектов
+        self.player1.move(0, 230)
+        self.player2.move(495, 230)
+        self.player1.setPixmap(self.player_image)  # Установка изображения
+        self.player2.setPixmap(self.player_image)
+        self.ball.setPixmap(self.ball_image)
+        self.score_table.setText(f'{self.player1_score}:{self.player2_score}')  # Показать счет
+        self.score_table.setFont(QFont('Decorative', 36))  # Установка шрифта и размера
+        self.timer.start(self.speed, self)
+
+    def new_game(self):  # Новая игра
+        self.ball.move(239, 239)
+        self.ball_moving_kx = choice(self.number_list)
+        self.ball_moving_ky = choice(self.number_list)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Up:  # Движение игрока 2
+            self.player2.move(self.player2.x(), self.player2.y() - 5)
+        if event.key() == Qt.Key_Down:
+            self.player2.move(self.player2.x(), self.player2.y() + 5)
+        if event.key() == Qt.Key_W:  # Движение игрока 1
+            self.player1.move(self.player1.x(), self.player1.y() - 5)
+        if event.key() == Qt.Key_S:
+            self.player1.move(self.player1.x(), self.player1.y() + 5)
+
+    def timerEvent(self, event):
+        self.score_table.setText(f'{self.player1_score}:{self.player2_score}')  # Обновление счета
+        self.ball.move(self.ball.x() + self.ball_moving_kx * 4, self.ball.y() + self.ball_moving_ky * 4)
+        # Движение мяча
+        if (self.ball.x() > 473 and self.player2.y() + 40 >= self.ball.y() + 11 >= self.player2.y()) or \
+                (self.ball.x() < 5 and self.player1.y() + 40 >= self.ball.y() + 11 >= self.player1.y()):
+            self.ball_moving_kx = -self.ball_moving_kx  # Отскок мяча, игрок отбил мяч
+        elif self.ball.x() > 473:
+            self.player1_score += 1
+            self.new_game()
+        elif self.ball.x() < 5:  # Если игрок не отбил мяч, увеличение счета
+            self.player2_score += 1
+            self.new_game()
+        if self.ball.y() > 478 or self.ball.y() < 0:  # Отскок мяча
+            self.ball_moving_ky = -self.ball_moving_ky
 
 
 class AmazingQuest(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.connect = sqlite3.connect('data\\AmazingQuest.db')
+        self.connect = sqlite3.connect('data\\AmazingQuest.db')  # Подключение к базе данных
         self.cur = self.connect.cursor()
         self.ending_btns = []
+        self.shooter = ShooterGame()
+        self.shooter_opened = False
+        self.chemistry_list = 0
         self.initUI()
 
-    def initUI(self):
+    def initUI(self):  # Загрузка главного меню
         if self.ending_btns:
             for i in range(20):
                 self.ending_btns[i].hide()
         uic.loadUi('data\\AmazingQuest.ui', self)
-        self.btn_start.clicked.connect(self.start)
+        self.btn_start.clicked.connect(self.start_quest)
         self.btn_endings.clicked.connect(self.endings)
         self.btn_settings.clicked.connect(self.settings)
         self.btn_quit.clicked.connect(self.quit)
 
-    def start(self):
-        self.cur.execute("""DELETE FROM Log""")
+    def start_quest(self):  # Начать квест
+        self.cur.execute("""DELETE FROM Log""")  # Очистка лога
         self.connect.commit()
         uic.loadUi('data\\AmazingQuestStart.ui', self)
-        self.btn_1.clicked.connect(self.action1)
+        self.btn_1.clicked.connect(self.action1)  # Настройка кнопок
         self.btn_2.clicked.connect(self.action2)
         self.btn_3.clicked.connect(self.action3)
         self.btn_menu.clicked.connect(self.initUI)
-        self.btn_restart.clicked.connect(self.start)
+        self.btn_restart.clicked.connect(self.start_quest)
         self.btn_ending.clicked.connect(self.show_ending)
         self.id = 1
         self.ending_id = 0
         self.new_page()
 
-    def new_page(self):
+    def new_page(self):  # Открыть следующюю страницу
+        if self.id == 25:
+            if self.shooter_opened:
+                if self.shooter_game():
+                    self.id = 23
+                else:
+                    self.id = 27
+                self.shooter_opened = False
+            else:
+                self.shooter_game()
+                return 0
+        elif self.id == 30:
+            if self.chemistry_list % 3 == 1:
+                self.ending_id = 11
+                self.ending()
+                return 0
+            elif self.chemistry_list % 3 == 2:
+                self.id = 31
+            self.chemistry_list = 0
         self.connect.commit()
         self.ending_info.hide()
         self.btn_menu.hide()
@@ -378,6 +459,8 @@ class AmazingQuest(QMainWindow):
 
     def action1(self):
         self.cur.execute("""INSERT INTO Log(action) VALUES(1)""")
+        if int(self.id1) in [28, 29, 30]:
+            self.chemistry_list += 1
         if not self.id1.isdigit():
             self.ending_id = int(self.id1[1:])
             self.ending()
@@ -387,6 +470,8 @@ class AmazingQuest(QMainWindow):
 
     def action2(self):
         self.cur.execute("""INSERT INTO Log(action) VALUES(2)""")
+        if int(self.id2) in [28, 29, 30]:
+            self.chemistry_list += 2
         if not self.id2.isdigit():
             self.ending_id = int(self.id2[1:])
             self.ending()
@@ -396,6 +481,8 @@ class AmazingQuest(QMainWindow):
 
     def action3(self):
         self.cur.execute("""INSERT INTO Log(action) VALUES(3)""")
+        if int(self.id3) in [28, 29, 30]:
+            self.chemistry_list += 3
         if not self.id3.isdigit():
             self.ending_id = int(self.id3[1:])
             self.ending()
@@ -425,6 +512,20 @@ class AmazingQuest(QMainWindow):
             text.close()
         self.text_file.close()
         self.connect.commit()
+
+    def shooter_game(self):
+        if not self.shooter_opened:
+            self.shooter = ShooterGame()
+            self.shooter.show()
+            self.shooter_opened = True
+        else:
+            if self.shooter.score == 3:
+                return True
+            elif self.shooter.attempts == 0:
+                return False
+            self.shooter = 0
+            self.shooter = ShooterGame()
+            self.shooter.hide()
 
     def show_ending(self):
         self.ending_info.show()
@@ -471,9 +572,154 @@ class AmazingQuest(QMainWindow):
 
     def settings(self):
         uic.loadUi('data\\AmazingQuestSettings.ui', self)
+        self.btn_return.clicked.connect(self.initUI)
 
     def quit(self):
         self.close()
+
+
+class ShooterGame(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(500, 500)  # Установка размера окна
+        self.setWindowTitle('Стрельба')  # Установка названия окна
+        self.background = QLabel(self)
+        self.target1 = QLabel(self)
+        self.target2 = QLabel(self)
+        self.target3 = QLabel(self)
+        self.gun = QLabel(self)
+        self.ball = QLabel(self)
+        self.attempts_table = QLabel(self)
+        self.score_table = QLabel(self)
+        self.winner_table = QLabel(self)
+        self.loser_table = QLabel(self)
+        self.background_image = QPixmap('data\\белый фон.jpg')  # Загрузка изображения фона
+        self.ball_image = QPixmap('data\\ball.png')  # Загрузка изображения снаряда
+        self.ufo_image = QPixmap('data\\UFO1.png')  # Загрузка изображения цели
+        self.gun_image = QPixmap('data\\gun.png')  # Загрузка изображения пушки
+        self.move_1 = choice([-1, 1])  # Движение целей налево/направо
+        self.move_2 = choice([-1, 1])
+        self.move_3 = choice([-1, 1])
+        self.ball_timer = QtCore.QBasicTimer()
+        self.target_timer = QtCore.QBasicTimer()
+        self.ending_timer = QtCore.QBasicTimer()
+        self.ball_speed = 1  # Скорость снаряда
+        self.target_speed = 10  # Скорость целей
+        self.attempts = 3  # Количество попыток
+        self.score = 0  # Счет
+        self.start()
+
+    def start(self):
+        self.ball_timer.start(self.ball_speed, self)
+        self.target_timer.start(self.target_speed, self)
+        self.attempts_table.resize(200, 50)
+        self.score_table.resize(200, 50)
+        self.target1.resize(52, 51)
+        self.target2.resize(52, 51)
+        self.target3.resize(52, 51)
+        self.ball.resize(22, 22)
+        self.gun.resize(22, 64)
+        self.loser_table.resize(250, 80)
+        self.winner_table.resize(250, 80)
+        self.gun.move(239, 450)  # Расположить пушку
+        self.loser_table.move(150, 170)
+        self.winner_table.move(150, 170)
+        self.attempts_table.move(385, -10)
+        self.score_table.move(455, 20)  # Расположить табло очков
+        self.target1.move(choice(range(448)), 10)  # Расположить цели случайным образом
+        self.target2.move(choice(range(448)), 61)
+        self.target3.move(choice(range(448)), 112)
+        self.background.resize(500, 500)
+        self.background.setPixmap(self.background_image)  # Установка белого меню
+        self.gun.setPixmap(self.gun_image)  # Установка изображения пушки
+        self.ball.setPixmap(self.ball_image)  # Установка изображения снаряда
+        self.target1.setPixmap(self.ufo_image)  # Установка изображений целей
+        self.target2.setPixmap(self.ufo_image)
+        self.target3.setPixmap(self.ufo_image)
+        self.winner_table.setText('YOU WIN!')
+        self.loser_table.setText('YOU LOSE!')
+        self.attempts_table.setText(f'Осталось попыток:{self.attempts}')
+        self.score_table.setText(f'Счет:{self.score}')
+        self.ball.hide()
+        self.winner_table.hide()
+        self.loser_table.hide()
+        self.winner_table.setFont(QFont('Decorative', 36))  # Установка шрифта и размера текста
+        self.loser_table.setFont(QFont('Decorative', 36))
+
+    def move_targets(self):  # Движение целей
+        self.target1.move(self.target1.x() - self.move_1, 10)
+        self.target2.move(self.target2.x() - self.move_2, 61)
+        self.target3.move(self.target3.x() - self.move_3, 112)
+        if self.target1.x() > 450 or self.target1.x() < 0:  # Если за пределами окна, то движение в обратную сторону
+            self.move_1 = -self.move_1
+        if self.target2.x() > 450 or self.target2.x() < 0:
+            self.move_2 = -self.move_2
+        if self.target3.x() > 450 or self.target3.x() < 0:
+            self.move_3 = -self.move_3
+
+    def move_ball(self):  # Движение снаряда
+        if self.ball.isVisible():  # Если снаряд выпущен, то двигать его вверх
+            self.ball.move(self.ball.x(), self.ball.y() - 1)
+            self.check_status()
+        if self.ball.y() < 0 and self.ball.isVisible():  # Если снаряд выпущен и он за пределами окна
+            self.attempts -= 1  # то обьявить промах, уменьшить количество попыток и скрыть снаряд
+            self.ball.hide()
+
+    def check_status(self):  # Проверка, попал ли мяч по цели
+        if self.target1.x() <= self.ball.x() <= self.target1.x() + 52 and \
+                self.target1.y() <= self.ball.y() <= self.target1.y() + 51:
+            self.target1.hide()
+            self.ball.hide()
+            self.score += 1
+        if self.target2.x() <= self.ball.x() <= self.target2.x() + 52 and \
+                self.target2.y() <= self.ball.y() <= self.target2.y() + 51:
+            self.target2.hide()
+            self.ball.hide()
+            self.score += 1
+        if self.target3.x() <= self.ball.x() <= self.target3.x() + 52 and \
+                self.target3.y() <= self.ball.y() <= self.target3.y() + 51:
+            self.target3.hide()
+            self.ball.hide()
+            self.score += 1
+
+    def game_over(self):
+        if self.attempts == 0:  # Если попытки кончились, то вывести надпись проигравшего
+            self.loser_table.show()
+        elif self.score == 3:  # Иначе вывести надпись выигравшего
+            self.winner_table.show()
+        self.target1.hide()  # Спрятать остальные обьекты
+        self.target2.hide()
+        self.target3.hide()
+        self.gun.hide()
+        self.ball.hide()
+        self.ending_timer.start(2500, self)  # Начать обратный отсчет
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Left:  # Движение пушки
+            self.gun.move(self.gun.x() - 10, self.gun.y())
+        if event.key() == Qt.Key_Right:
+            self.gun.move(self.gun.x() + 10, self.gun.y())
+        if event.key() == Qt.Key_Space and not self.ball.isVisible():  # Выстрел
+            self.ball.show()
+            self.ball.move(self.gun.x(), self.gun.y() - 22)
+
+    def timerEvent(self, event):
+        self.attempts_table.setText(f'Осталось попыток:{self.attempts}')  # Обновление таблицы очков и попыток
+        self.score_table.setText(f'Счет:{self.score}')
+        if event.timerId() == self.ending_timer.timerId():  # Если прошло определенное время после
+            self.ending_timer.stop()  # окончания игры, то закрыть окно
+            ex.questwindow.new_page()  # Вызвать метод new_page() квеста, чтобы получить результат
+            # этой игры, и развивать сюжетную линию по этому результату.
+            self.close()
+        else:
+            if self.attempts == 0 or self.score == 3:  # Завершить игру
+                self.ball_timer.stop()
+                self.target_timer.stop()
+                self.game_over()
+            if event.timerId() == self.ball_timer.timerId():  # Движение мяча
+                self.move_ball()
+            if event.timerId() == self.target_timer.timerId():  # Движение целей
+                self.move_targets()
 
 
 if __name__ == '__main__':
