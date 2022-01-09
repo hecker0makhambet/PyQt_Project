@@ -8,9 +8,10 @@ from PyQt5.QtGui import QPixmap, QPalette, QBrush, QFont
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton
 background_image_path = 'data\\обой2.jpg'
-background_snake_image_path = 'data\\snake_background.png'
 # Нужно написать комментарии
-# Нужно добавить задний фон к квесту и пинг понгу
+# Нужно добавить музыку
+# Нужно добавить задний фон
+# Нужно закончить квест
 
 
 class MainWindow(QMainWindow):
@@ -57,7 +58,7 @@ class MainWindow(QMainWindow):
 class FirstGame(QMainWindow):
     def __init__(self):
         super().__init__()
-        media = QtCore.QUrl.fromLocalFile('data\\sounds\\snake-1.mp3')
+        media = QtCore.QUrl.fromLocalFile('data\\zvuk-notyi-lya.mp3')
         content = QtMultimedia.QMediaContent(media)
         self.catch_sound = QtMultimedia.QMediaPlayer()
         self.catch_sound.setMedia(content)
@@ -217,15 +218,11 @@ class FirstGame(QMainWindow):
 class SecondGame(QMainWindow):
     def __init__(self):
         super().__init__()
-        background_image = QPixmap(background_snake_image_path)  # Установка фонового изображения
-        palette = QPalette()
-        palette.setBrush(QPalette.Background, QBrush(background_image))
-        self.setPalette(palette)
-        media = QtCore.QUrl.fromLocalFile('data\\sounds\\snake-2.mp3')
+        media = QtCore.QUrl.fromLocalFile('data\\zvuk-notyi-do.mp3')
         content = QtMultimedia.QMediaContent(media)
         self.food_eaten_sound = QtMultimedia.QMediaPlayer()
         self.food_eaten_sound.setMedia(content)
-        media = QtCore.QUrl.fromLocalFile('data\\sounds\\snake-1.mp3')
+        media = QtCore.QUrl.fromLocalFile('data\\sounds\\loser-sound-2.mp3')
         content = QtMultimedia.QMediaContent(media)
         self.loser_sound = QtMultimedia.QMediaPlayer()
         self.loser_sound.setMedia(content)
@@ -234,7 +231,7 @@ class SecondGame(QMainWindow):
     def launch(self):
         self.highscore = 0
         self.new_game()
-        # self.setStyleSheet("QWidget { background: #A9F5D0 }")  # Установка цвета окна
+        self.setStyleSheet("QWidget { background: #A9F5D0 }")  # Установка цвета окна
         self.setFixedSize(300, 300)  # Установка размера окна
         self.setWindowTitle('Snake')  # Установка названия окна
         self.show()
@@ -347,7 +344,7 @@ class SecondGame(QMainWindow):
             self.foody = randrange(23)
             if not [self.foodx, self.foody] in self.snakeArray:  # Если еда не находится в
                 self.FoodPlaced = True  # той же клетке, что и змея, то рисуем еду
-        qp.setBrush(QtGui.QColor(255, 180, 0, 160))  # Задаем цвет
+        qp.setBrush(QtGui.QColor(80, 180, 0, 160))  # Задаем цвет
         qp.drawRect(self.foodx * 12, 24 + self.foody * 12, 12, 12)  # Рисуем
 
     def draw_snake(self, qp):  # Рисует змею
@@ -382,7 +379,7 @@ class ThirdGame(QMainWindow):
         content = QtMultimedia.QMediaContent(media)
         self.pong_sound = QtMultimedia.QMediaPlayer()
         self.pong_sound.setMedia(content)
-        media = QtCore.QUrl.fromLocalFile('data\\sounds\\snake-1.mp3')
+        media = QtCore.QUrl.fromLocalFile('data\\zvuk-notyi-do.mp3')
         content = QtMultimedia.QMediaContent(media)
         self.goal_sound = QtMultimedia.QMediaPlayer()
         self.goal_sound.setMedia(content)
@@ -465,7 +462,7 @@ class AmazingQuest(QMainWindow):
         if self.sound_is_active:
             self.click_sound.play()
         if self.ending_btns:
-            for i in range(25):
+            for i in range(20):
                 self.ending_btns[i].hide()
         uic.loadUi('data\\AmazingQuest.ui', self)
         self.btn_start.clicked.connect(self.start_quest)
@@ -710,12 +707,14 @@ class AmazingQuest(QMainWindow):
         self.ending_info.hide()
         self.btn_return.hide()
         self.ending_btns = []
-        for i in range(24):
+        for i in range(18):
             self.ending_btns.append(QPushButton(str(i + 1), self))
             self.ending_btns[-1].move(i % 6 * 60 + 80, i // 6 * 60 + 30)
-        self.ending_btns.append(QPushButton('25', self))
-        self.ending_btns[-1].move(230, 270)
-        for i in range(25):
+        self.ending_btns.append(QPushButton('19', self))
+        self.ending_btns[-1].move(170, 220)
+        self.ending_btns.append(QPushButton('20', self))
+        self.ending_btns[-1].move(290, 220)
+        for i in range(20):
             self.ending_btns[i].clicked.connect(self.show_ending_2)
             self.ending_btns[i].resize(50, 50)
             self.ending_btns[i].show()
@@ -724,7 +723,7 @@ class AmazingQuest(QMainWindow):
         if self.sound_is_active:
             self.click_sound.play()
         self.ending_info.show()
-        for i in range(25):
+        for i in range(20):
             self.ending_btns[i].hide()
             if self.sender() == self.ending_btns[i]:
                 if list(self.cur.execute(f"""SELECT ending_id FROM 'Opened endings'
@@ -740,7 +739,7 @@ class AmazingQuest(QMainWindow):
         if self.sound_is_active:
             self.click_sound.play()
         self.ending_info.hide()
-        for i in range(25):
+        for i in range(20):
             self.ending_btns[i].show()
         self.btn_return.hide()
 
@@ -754,14 +753,21 @@ class AmazingQuest(QMainWindow):
             self.btn_sounds.setText('Включить звуковые эффекты')
         self.btn_return.clicked.connect(self.main_menu)
         self.btn_sounds.clicked.connect(self.sounds)
+        self.btn_soundtrack.clicked.connect(self.soundtrack)
 
     def sounds(self):
         self.sound_is_active = not self.sound_is_active
         if self.sound_is_active:
             self.btn_sounds.setText('Отключить звуковые эффекты')
-            self.click_sound.play()
         else:
             self.btn_sounds.setText('Включить звуковые эффекты')
+
+    def soundtrack(self):
+        self.music_is_active = not self.music_is_active
+        if self.music_is_active:
+            self.btn_soundtrack.setText('Отключить музыку')
+        else:
+            self.btn_soundtrack.setText('Включить музыку')
 
     def quit(self):
         if self.sound_is_active:
