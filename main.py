@@ -7,10 +7,11 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QPalette, QBrush, QFont
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton
-background_image_path = 'data\\обой2.jpg'
-background_snake_image_path = 'data\\snake_background.png'
+background_image_path = 'data\\images\\обой2.jpg'
+background_snake_image_path = 'data\\images\\snake_background.png'
+background_quest_menu_image_path = 'data\\images\\quest-1.jpg'
+background_quest_game_image_path = 'data\\images\\quest-2.png'
 # Нужно написать комментарии
-# Нужно добавить задний фон к квесту и пинг понгу
 
 
 class MainWindow(QMainWindow):
@@ -71,14 +72,14 @@ class FirstGame(QMainWindow):
         self.click_sound.setMedia(content)
         self.background = QLabel(self)
         self.background.resize(600, 600)
-        self.background.setPixmap(QPixmap('data\\белый фон.jpg'))  # Установка белого фона
+        self.background.setPixmap(QPixmap('data\\images\\белый фон.jpg'))  # Установка белого фона
         uic.loadUi('data\\FirstGame.ui', self)  # Загрузка ui файла
         self.setWindowTitle('Поймай НЛО!')  # Установка названия окна
-        self.im1 = QPixmap('data\\UFO1.png')  # Загрузка изоображения НЛО
-        self.hero_up = QPixmap('data\\main_hero_up.png')  # Загрузка изображений игрока
-        self.hero_down = QPixmap('data\\main_hero_down.png')
-        self.hero_right = QPixmap('data\\main_hero_right.png')
-        self.hero_left = QPixmap('data\\main_hero_left.png')
+        self.im1 = QPixmap('data\\images\\UFO1.png')  # Загрузка изоображения НЛО
+        self.hero_up = QPixmap('data\\images\\main_hero_up.png')  # Загрузка изображений игрока
+        self.hero_down = QPixmap('data\\images\\main_hero_down.png')
+        self.hero_right = QPixmap('data\\images\\main_hero_right.png')
+        self.hero_left = QPixmap('data\\images\\main_hero_left.png')
         self.hero = QLabel(self)
         self.hero.setPixmap(self.hero_up)  # Создание главного персонажа
         self.hero.resize(74, 58)
@@ -365,8 +366,8 @@ class ThirdGame(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setFixedSize(500, 500)  # Установка размера окна
-        self.player_image = QPixmap('data\\ping_pong_player.png')  # Загрузка изображения игрока
-        self.ball_image = QPixmap('data\\ball.png')  # Загрузка изображения мяча
+        self.player_image = QPixmap('data\\images\\ping_pong_player.png')  # Загрузка изображения игрока
+        self.ball_image = QPixmap('data\\images\\ball.png')  # Загрузка изображения мяча
         self.score_table = QLabel(self)  # Обьявление таблицы очков
         self.player1 = QLabel(self)  # Обьявление игрока 1
         self.player2 = QLabel(self)  # Обьявление игрока 2
@@ -468,6 +469,10 @@ class AmazingQuest(QMainWindow):
             for i in range(25):
                 self.ending_btns[i].hide()
         uic.loadUi('data\\AmazingQuest.ui', self)
+        background_image = QPixmap(background_quest_menu_image_path)  # Установка фонового изображения
+        palette = QPalette()
+        palette.setBrush(QPalette.Background, QBrush(background_image))
+        self.setPalette(palette)
         self.btn_start.clicked.connect(self.start_quest)
         self.btn_endings.clicked.connect(self.endings)
         self.btn_settings.clicked.connect(self.settings)
@@ -479,13 +484,17 @@ class AmazingQuest(QMainWindow):
         self.cur.execute("""DELETE FROM Log""")  # Очистка лога
         self.connect.commit()
         uic.loadUi('data\\AmazingQuestStart.ui', self)
+        background_image = QPixmap(background_quest_game_image_path)  # Установка фонового изображения
+        palette = QPalette()
+        palette.setBrush(QPalette.Background, QBrush(background_image))
+        self.setPalette(palette)
         self.btn_1.clicked.connect(self.action1)  # Настройка кнопок
         self.btn_2.clicked.connect(self.action2)
         self.btn_3.clicked.connect(self.action3)
         self.btn_menu.clicked.connect(self.main_menu)
         self.btn_restart.clicked.connect(self.start_quest)
         self.btn_ending.clicked.connect(self.show_ending)
-        self.id = 43
+        self.id = 1
         self.ending_id = 0
         self.shooter = ShooterGame()
         self.shooter_opened = False
@@ -591,16 +600,16 @@ class AmazingQuest(QMainWindow):
         self.hacking_bar = QLabel(self)
         self.hacking_bar.resize(361, 30)
         self.hacking_bar.move(90, 230)
-        self.hacking_bar_image = QPixmap('data\\blue_bar.png')
+        self.hacking_bar_image = QPixmap('data\\images\\blue_bar.png')
         self.hacking_bar.setPixmap(self.hacking_bar_image)
         self.hacking_target = QLabel(self)
         self.hacking_target.resize(20, 30)
-        self.hacking_target_image = QPixmap('data\\red_square.png')
+        self.hacking_target_image = QPixmap('data\\images\\red_square.png')
         self.hacking_target.setPixmap(self.hacking_target_image)
         self.hacking_target.move(260, 230)
         self.hacking_black_bar = QLabel(self)
         self.hacking_black_bar.resize(5, 30)
-        self.hacking_black_bar_image = QPixmap('data\\black_bar.png')
+        self.hacking_black_bar_image = QPixmap('data\\images\\black_bar.png')
         self.hacking_black_bar.setPixmap(self.hacking_target_image)
         self.hacking_black_bar.move(90, 230)
         self.hacking_bar.show()
@@ -800,10 +809,10 @@ class ShooterGame(QMainWindow):
         self.score_table = QLabel(self)
         self.winner_table = QLabel(self)
         self.loser_table = QLabel(self)
-        self.background_image = QPixmap('data\\белый фон.jpg')  # Загрузка изображения фона
-        self.ball_image = QPixmap('data\\ball.png')  # Загрузка изображения снаряда
-        self.ufo_image = QPixmap('data\\UFO1.png')  # Загрузка изображения цели
-        self.gun_image = QPixmap('data\\gun.png')  # Загрузка изображения пушки
+        self.background_image = QPixmap('data\\images\\белый фон.jpg')  # Загрузка изображения фона
+        self.ball_image = QPixmap('data\\images\\ball.png')  # Загрузка изображения снаряда
+        self.ufo_image = QPixmap('data\\images\\UFO1.png')  # Загрузка изображения цели
+        self.gun_image = QPixmap('data\\images\\gun.png')  # Загрузка изображения пушки
         self.move_1 = choice([-1, 1])  # Движение целей налево/направо
         self.move_2 = choice([-1, 1])
         self.move_3 = choice([-1, 1])
