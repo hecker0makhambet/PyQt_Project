@@ -696,7 +696,7 @@ class AmazingQuest(QMainWindow):
             text = open(f'data\\endings\\{self.ending_id}.txt', 'w', encoding='utf-8')  # Открыть файл
             a = '\n-----\n'.join(self.text) + \
                 '\n-----\n' + ''.join([str(i[0]) for i in list(self.cur.execute("""SELECT action FROM Log"""))])
-            # Изменить текст
+            # Изменить текст концовки, т.е. добавить к тексту ключ к этой концовке
             print(a, end='', file=text)  # Добавить ключ к этой концовке в конец файла
             text.close()  # Закрыть файл
         self.text_file.close()  # Закрыть файл

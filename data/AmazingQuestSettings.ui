@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Settings</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="btn_return">
@@ -164,6 +164,32 @@
     </property>
     <property name="text">
      <string>Тыныштык Дархан</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_background">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>320</y>
+      <width>181</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Задать тему главного меню</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_background_2">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>370</y>
+      <width>181</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Задать тему квеста</string>
     </property>
    </widget>
   </widget>
