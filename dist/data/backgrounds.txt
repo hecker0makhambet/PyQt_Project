@@ -1,0 +1,4 @@
+data\images\обой2.jpg
+data\images\snake_background.png
+data\images\quest-1.jpg
+data\images\quest-2.png
